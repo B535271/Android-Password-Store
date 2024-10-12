@@ -8,3 +8,7 @@ plugins {
   id("com.github.android-password-store.spotless")
   id("com.github.android-password-store.versions")
 }
+
+tasks.named("wrapper") {
+    enabled = false
+}
