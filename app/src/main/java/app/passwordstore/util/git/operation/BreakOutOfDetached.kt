@@ -4,6 +4,7 @@
  */
 package app.passwordstore.util.git.operation
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import app.passwordstore.R
 import app.passwordstore.data.repo.PasswordRepository
@@ -14,7 +15,7 @@ import org.eclipse.jgit.api.RebaseCommand
 import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.lib.RepositoryState
 
-class BreakOutOfDetached(callingActivity: AppCompatActivity) : GitOperation(callingActivity) {
+class BreakOutOfDetached(callingActivity: Activity) : GitOperation(callingActivity) {
 
   private val merging = repository.repositoryState == RepositoryState.MERGING
   private val localBranch = PasswordRepository.getCurrentBranch()

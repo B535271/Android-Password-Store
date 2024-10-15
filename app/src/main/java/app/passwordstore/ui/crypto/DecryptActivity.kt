@@ -22,8 +22,6 @@ import app.passwordstore.data.password.FieldItem
 import app.passwordstore.databinding.DecryptLayoutBinding
 import app.passwordstore.ui.adapters.FieldItemAdapter
 import app.passwordstore.ui.dialogs.BasicBottomSheet
-import app.passwordstore.util.auth.BiometricAuthenticator
-import app.passwordstore.util.auth.BiometricAuthenticator.Result as BiometricResult
 import app.passwordstore.util.extensions.getString
 import app.passwordstore.util.extensions.unsafeLazy
 import app.passwordstore.util.extensions.viewBinding
@@ -72,19 +70,7 @@ class DecryptActivity : BasePGPActivity() {
         true
       }
     }
-    if (
-      features.isEnabled(EnablePGPPassphraseCache) &&
-        BiometricAuthenticator.canAuthenticate(this@DecryptActivity)
-    ) {
-      BiometricAuthenticator.authenticate(
-        this@DecryptActivity,
-        R.string.biometric_prompt_title_gpg_passphrase_cache,
-      ) { authResult ->
-        requireKeysExist { decrypt(isError = false, authResult) }
-      }
-    } else {
-      requireKeysExist { decrypt(isError = false, BiometricResult.CanceledByUser) }
-    }
+    requireKeysExist { decrypt(isError = false) }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -160,50 +146,39 @@ class DecryptActivity : BasePGPActivity() {
     )
   }
 
-  private fun decrypt(isError: Boolean, authResult: BiometricResult) {
+  private fun decrypt(isError: Boolean) {
     val gpgIdentifiers = getPGPIdentifiers(relativeParentPath) ?: return
+    val hasCache = features.isEnabled(EnablePGPPassphraseCache)
     lifecycleScope.launch(dispatcherProvider.main()) {
-      when (authResult) {
-        // Internally handled by the prompt dialog
-        is BiometricResult.Retry -> {}
-        // If the dialog is dismissed for any reason, prompt for passphrase
-        is BiometricResult.CanceledByUser,
-        is BiometricResult.CanceledBySystem,
-        is BiometricResult.Failure,
-        is BiometricResult.HardwareUnavailableOrDisabled ->
-          askPassphrase(isError, gpgIdentifiers, authResult)
-        is BiometricResult.Success -> {
-          /* clear passphrase cache on first use after application startup or if screen was off;
-          also make sure to purge a stale cache after caching has been disabled via PGP settings */
-          clearCache = settings.getBoolean(PreferenceKeys.CLEAR_PASSPHRASE_CACHE, true)
-          if (screenWasOff && clearCache) {
-            passphraseCache.clearAllCachedPassphrases(this@DecryptActivity)
-            screenWasOff = false
-          }
-          val cachedPassphrase =
-            passphraseCache.retrieveCachedPassphrase(this@DecryptActivity, gpgIdentifiers.first())
-          if (cachedPassphrase != null) {
-            decryptWithPassphrase(cachedPassphrase, gpgIdentifiers, authResult)
-          } else {
-            askPassphrase(isError, gpgIdentifiers, authResult)
-          }
+      if (!hasCache) {
+        askPassphrase(isError, gpgIdentifiers)
+      } else {
+        /* clear passphrase cache on first use after application startup or if screen was off;
+        also make sure to purge a stale cache after caching has been disabled via PGP settings */
+        clearCache = settings.getBoolean(PreferenceKeys.CLEAR_PASSPHRASE_CACHE, true)
+        if (screenWasOff && clearCache) {
+          passphraseCache.clearAllCachedPassphrases(this@DecryptActivity)
+          screenWasOff = false
+        }
+        val cachedPassphrase =
+          passphraseCache.retrieveCachedPassphrase(this@DecryptActivity, gpgIdentifiers.first())
+        if (cachedPassphrase != null) {
+          decryptWithPassphrase(cachedPassphrase, gpgIdentifiers)
+        } else {
+          askPassphrase(isError, gpgIdentifiers)
         }
       }
     }
   }
 
-  private suspend fun askPassphrase(
-    isError: Boolean,
-    gpgIdentifiers: List<PGPIdentifier>,
-    authResult: BiometricResult,
-  ) {
+  private suspend fun askPassphrase(isError: Boolean, gpgIdentifiers: List<PGPIdentifier>) {
     if (retries < MAX_RETRIES) {
       retries += 1
     } else {
       finish()
     }
     if (!repository.isPasswordProtected(gpgIdentifiers)) {
-      decryptWithPassphrase(passphrase = "", gpgIdentifiers, authResult)
+      decryptWithPassphrase(passphrase = "", gpgIdentifiers)
       return
     }
     val dialog =
@@ -220,16 +195,14 @@ class DecryptActivity : BasePGPActivity() {
         val passphrase = bundle.getString(PasswordDialog.PASSWORD_PHRASE_KEY)!!
         clearCache = bundle.getBoolean(PasswordDialog.PASSWORD_CLEAR_KEY)
         lifecycleScope.launch(dispatcherProvider.main()) {
-          decryptWithPassphrase(passphrase, gpgIdentifiers, authResult) {
+          decryptWithPassphrase(passphrase, gpgIdentifiers) {
             runCatching {
-                if (authResult is BiometricResult.Success) {
-                  passphraseCache.cachePassphrase(
-                    this@DecryptActivity,
-                    gpgIdentifiers.first(),
-                    passphrase,
-                  )
-                  settings.edit { putBoolean(PreferenceKeys.CLEAR_PASSPHRASE_CACHE, clearCache) }
-                }
+                passphraseCache.cachePassphrase(
+                  this@DecryptActivity,
+                  gpgIdentifiers.first(),
+                  passphrase,
+                )
+                settings.edit { putBoolean(PreferenceKeys.CLEAR_PASSPHRASE_CACHE, clearCache) }
               }
               .onFailure { e -> logcat { e.asLog() } }
           }
@@ -241,7 +214,6 @@ class DecryptActivity : BasePGPActivity() {
   private suspend fun decryptWithPassphrase(
     passphrase: String,
     identifiers: List<PGPIdentifier>,
-    authResult: BiometricResult,
     onSuccess: suspend () -> Unit = {},
   ) {
     val message = withContext(dispatcherProvider.io()) { File(fullPath).readBytes().inputStream() }
@@ -271,7 +243,7 @@ class DecryptActivity : BasePGPActivity() {
             .build()
             .show(supportFragmentManager, "AEAD_INFO_SHEET")
         }
-        else -> decrypt(isError = true, authResult = authResult)
+        else -> decrypt(isError = true)
       }
     }
   }

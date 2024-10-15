@@ -6,7 +6,8 @@
 
 rootProject.name = "build-logic"
 
-plugins { id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0" }
+// use system toolchains for now
+// plugins { id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0" }
 
 dependencyResolutionManagement {
   repositories {

@@ -9,10 +9,6 @@
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-  <!-- Required by Autofill to verify the certificate hashes of packages -->
-  <uses-permission
-    android:name="android.permission.QUERY_ALL_PACKAGES"
-    tools:ignore="QueryAllPackagesPermission" />
 
   <uses-feature
     android:name="android.hardware.touchscreen"
@@ -30,8 +26,8 @@
     android:label="@string/app_name"
     android:supportsRtl="true"
     android:theme="@style/AppThemeM3"
-    tools:ignore="GoogleAppIndexingWarning"
-    tools:targetApi="s">
+    android:hardwareAccelerated="true">
+    <!-- hardwareAccel required for barcode scanner-->
 
     <activity
       android:name=".ui.passwords.PasswordStore"
@@ -42,12 +38,6 @@
       android:name=".ui.onboarding.activity.OnboardingActivity"
       android:configChanges="orientation|screenSize"
       android:exported="false" />
-
-    <activity
-      android:name=".ui.proxy.ProxySelectorActivity"
-      android:exported="false"
-      android:label="@string/activity_proxy_label"
-      android:windowSoftInputMode="adjustResize" />
 
     <activity
       android:name=".ui.crypto.DecryptActivity"
@@ -112,17 +102,6 @@
       android:exported="false"
       android:foregroundServiceType="shortService"
       android:process=":password_export_service_process" />
-    <service
-      android:name=".util.services.OreoAutofillService"
-      android:exported="true"
-      android:permission="android.permission.BIND_AUTOFILL_SERVICE">
-      <intent-filter>
-        <action android:name="android.service.autofill.AutofillService" />
-      </intent-filter>
-      <meta-data
-        android:name="android.autofill"
-        android:resource="@xml/oreo_autofill_service" />
-    </service>
 
     <activity
       android:name=".ui.folderselect.SelectFolderActivity"
@@ -137,32 +116,6 @@
       android:exported="false"
       android:label="@string/pref_ssh_keygen_title"
       android:windowSoftInputMode="adjustResize" />
-    <activity
-      android:name=".ui.autofill.AutofillDecryptActivity"
-      android:exported="false"
-      android:theme="@style/NoBackgroundThemeM3" />
-    <activity
-      android:name=".ui.autofill.AutofillFilterView"
-      android:configChanges="orientation|keyboardHidden"
-      android:exported="false"
-      android:theme="@style/DialogLikeThemeM3"
-      android:windowSoftInputMode="adjustNothing" />
-    <activity
-      android:name=".ui.autofill.AutofillSaveActivity"
-      android:exported="false"
-      android:theme="@style/NoBackgroundThemeM3" />
-    <activity
-      android:name=".autofill.oreo.ui.AutofillSmsActivity"
-      android:configChanges="orientation"
-      android:exported="false"
-      android:theme="@style/DialogLikeThemeM3"
-      android:windowSoftInputMode="adjustNothing" />
-    <activity
-      android:name=".ui.autofill.AutofillPublisherChangedActivity"
-      android:configChanges="orientation|keyboardHidden"
-      android:exported="false"
-      android:theme="@style/DialogLikeThemeM3"
-      android:windowSoftInputMode="adjustNothing" />
     <activity
       android:name=".ui.pgp.PGPKeyImportActivity"
       android:theme="@style/NoBackgroundThemeM3" />

@@ -5,16 +5,15 @@
 
 package app.passwordstore.ui.crypto
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.CallSuper
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import app.passwordstore.R
@@ -87,19 +86,12 @@ open class BasePGPActivity : AppCompatActivity() {
    * Copies provided [text] to the clipboard. Shows a [Snackbar] which can be disabled by passing
    * [showSnackbar] as false.
    */
-  fun copyTextToClipboard(
-    text: String?,
-    showSnackbar: Boolean = true,
-    @StringRes snackbarTextRes: Int = R.string.clipboard_copied_text,
-  ) {
+  fun copyTextToClipboard(text: String?) {
     val clipboard = clipboard ?: return
     val clip = ClipData.newPlainText("pgp_handler_result_pm", text)
     clip.description.extras =
       PersistableBundle().apply { putBoolean("android.content.extra.IS_SENSITIVE", true) }
     clipboard.setPrimaryClip(clip)
-    if (showSnackbar && Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-      snackbar(message = resources.getString(snackbarTextRes))
-    }
   }
 
   /**

@@ -6,6 +6,7 @@
 package app.passwordstore.util.git.operation
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.WindowManager
@@ -31,7 +32,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 class CredentialFinder(
-  private val callingActivity: FragmentActivity,
+  private val callingActivity: Activity,
   private val authMode: AuthMode,
   dispatcherProvider: DispatcherProvider,
 ) : InteractivePasswordFinder(dispatcherProvider) {

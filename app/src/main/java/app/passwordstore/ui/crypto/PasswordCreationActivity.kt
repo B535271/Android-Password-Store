@@ -10,9 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.InputType
 import android.view.Menu
 import android.view.MenuItem
@@ -29,7 +27,6 @@ import app.passwordstore.databinding.PasswordCreationActivityBinding
 import app.passwordstore.ui.dialogs.DicewarePasswordGeneratorDialogFragment
 import app.passwordstore.ui.dialogs.OtpImportDialogFragment
 import app.passwordstore.ui.dialogs.PasswordGeneratorDialogFragment
-import app.passwordstore.util.autofill.AutofillPreferences
 import app.passwordstore.util.extensions.asLog
 import app.passwordstore.util.extensions.base64
 import app.passwordstore.util.extensions.commitChange
@@ -38,7 +35,6 @@ import app.passwordstore.util.extensions.isInsideRepository
 import app.passwordstore.util.extensions.snackbar
 import app.passwordstore.util.extensions.unsafeLazy
 import app.passwordstore.util.extensions.viewBinding
-import app.passwordstore.util.settings.DirectoryStructure
 import app.passwordstore.util.settings.PreferenceKeys
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
@@ -111,12 +107,9 @@ class PasswordCreationActivity : BasePGPActivity() {
         return@registerForActivityResult
       }
       val bitmap =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-          ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, imageUri))
-            .copy(Bitmap.Config.ARGB_8888, true)
-        } else {
-          @Suppress("DEPRECATION") MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-        }
+        ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, imageUri))
+          .copy(Bitmap.Config.ARGB_8888, true)
+
       val intArray = IntArray(bitmap.width * bitmap.height)
       // copy pixel data from the Bitmap into the 'intArray' array
       bitmap.getPixels(intArray, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
@@ -207,10 +200,7 @@ class PasswordCreationActivity : BasePGPActivity() {
         filename.requestFocus()
       }
 
-      if (
-        AutofillPreferences.directoryStructure(this@PasswordCreationActivity) ==
-          DirectoryStructure.EncryptedUsername || suggestedUsername != null
-      ) {
+      if (suggestedUsername != null) {
         usernameInputLayout.visibility = View.VISIBLE
         if (suggestedUsername != null) username.setText(suggestedUsername)
         else if (suggestedName != null) username.requestFocus()
@@ -219,11 +209,7 @@ class PasswordCreationActivity : BasePGPActivity() {
       // Allow the user to quickly switch between storing the username as the filename or
       // in the encrypted extras. This only makes sense if the directory structure is
       // FileBased.
-      if (
-        suggestedName == null &&
-          AutofillPreferences.directoryStructure(this@PasswordCreationActivity) ==
-            DirectoryStructure.FileBased
-      ) {
+      if (suggestedName == null) {
         encryptUsername.apply {
           visibility = View.VISIBLE
           setOnClickListener {
@@ -419,12 +405,9 @@ class PasswordCreationActivity : BasePGPActivity() {
             returnIntent.putExtra(RETURN_EXTRA_LONG_NAME, getLongName(fullPath, repoPath, editName))
 
             if (shouldGeneratePassword) {
-              val directoryStructure = AutofillPreferences.directoryStructure(applicationContext)
               val entry = passwordEntryFactory.create(content.encodeToByteArray())
               returnIntent.putExtra(RETURN_EXTRA_PASSWORD, entry.password)
-              val username =
-                entry.username ?: directoryStructure.getUsernameFor(passwordFile.toFile())
-              returnIntent.putExtra(RETURN_EXTRA_USERNAME, username)
+              returnIntent.putExtra(RETURN_EXTRA_USERNAME, entry.username)
             }
 
             if (

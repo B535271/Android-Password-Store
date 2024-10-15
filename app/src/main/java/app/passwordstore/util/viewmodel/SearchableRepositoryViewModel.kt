@@ -5,6 +5,7 @@
 package app.passwordstore.util.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -24,9 +25,10 @@ import androidx.recyclerview.widget.RecyclerView
 import app.passwordstore.data.password.PasswordItem
 import app.passwordstore.data.repo.PasswordRepository
 import app.passwordstore.injection.prefs.SettingsPreferences
-import app.passwordstore.util.autofill.AutofillPreferences
 import app.passwordstore.util.checkMainThread
 import app.passwordstore.util.coroutines.DispatcherProvider
+import app.passwordstore.util.extensions.getString
+import app.passwordstore.util.extensions.sharedPrefs
 import app.passwordstore.util.settings.DirectoryStructure
 import app.passwordstore.util.settings.PasswordSortOrder
 import app.passwordstore.util.settings.PreferenceKeys
@@ -109,6 +111,11 @@ enum class ListMode {
   AllEntries,
 }
 
+private fun directoryStructure(context: Context): DirectoryStructure {
+  val value = context.sharedPrefs.getString(PreferenceKeys.DIRECTORY_STRUCTURE)
+  return DirectoryStructure.fromValue(value)
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SearchableRepositoryViewModel
@@ -145,7 +152,7 @@ constructor(
     get() = PasswordSortOrder.getSortOrder(settings)
 
   private val directoryStructure
-    get() = AutofillPreferences.directoryStructure(getApplication())
+    get() = directoryStructure(getApplication())
 
   private val itemComparator
     get() = PasswordItem.makeComparator(typeSortOrder, directoryStructure)

@@ -5,47 +5,22 @@
 package app.passwordstore.ui.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
 import app.passwordstore.ui.crypto.BasePGPActivity
 import app.passwordstore.ui.crypto.DecryptActivity
 import app.passwordstore.ui.passwords.PasswordStore
-import app.passwordstore.util.auth.BiometricAuthenticator
-import app.passwordstore.util.auth.BiometricAuthenticator.Result
-import app.passwordstore.util.extensions.sharedPrefs
-import app.passwordstore.util.settings.PreferenceKeys
 
 @SuppressLint("CustomSplashScreen")
-class LaunchActivity : AppCompatActivity() {
+class LaunchActivity : Activity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val prefs = sharedPrefs
-    if (prefs.getBoolean(PreferenceKeys.BIOMETRIC_AUTH_2, false)) {
-      BiometricAuthenticator.authenticate(this) { result ->
-        when (result) {
-          is Result.Success -> {
-            startTargetActivity(false)
-          }
-          is Result.HardwareUnavailableOrDisabled -> {
-            prefs.edit { remove(PreferenceKeys.BIOMETRIC_AUTH_2) }
-            startTargetActivity(false)
-          }
-          is Result.Failure,
-          Result.CanceledBySystem,
-          Result.CanceledByUser -> {
-            finish()
-          }
-          is Result.Retry -> {}
-        }
-      }
-    } else {
-      startTargetActivity(true)
-    }
+    startTargetActivity(true)
   }
 
   private fun getDecryptIntent(): Intent {

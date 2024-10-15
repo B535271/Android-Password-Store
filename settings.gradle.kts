@@ -6,10 +6,11 @@
 
 rootProject.name = "APS"
 
+includeBuild("build-logic")
+
 // Plugin repositories
 pluginManagement {
   repositories {
-    includeBuild("build-logic")
     google {
       content {
         includeGroup("androidx.databinding")
@@ -23,11 +24,13 @@ pluginManagement {
         includeModule("com.gradle", "develocity-gradle-plugin")
         includeModule("com.gradle.develocity", "com.gradle.develocity.gradle.plugin")
         includeModule("me.tylerbwong.gradle.metalava", "plugin")
+        /*
         includeModule(
           "org.gradle.toolchains.foojay-resolver-convention",
           "org.gradle.toolchains.foojay-resolver-convention.gradle.plugin",
         )
         includeModule("org.gradle.toolchains", "foojay-resolver")
+         */
       }
     }
     exclusiveContent {
@@ -39,8 +42,15 @@ pluginManagement {
 }
 
 plugins {
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
   id("com.gradle.develocity") version "3.18.1"
+//  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+
+  id("com.autonomousapps.build-health") version "2.1.4"
+  // apply these at root so ^ deps analysis plugin works
+  id("org.jetbrains.kotlin.jvm") version "2.0.21" apply false
+  id("org.jetbrains.kotlin.android") version "2.0.21" apply false
+  id("com.android.application") version "8.7.1" apply false
+  id("com.google.dagger.hilt.android") version "2.52" apply false
 }
 
 develocity {
@@ -66,10 +76,6 @@ dependencyResolutionManagement {
       forRepository { maven("https://storage.googleapis.com/r8-releases/raw") }
       filter { includeModule("com.android.tools", "r8") }
     }
-    maven("https://androidx.dev/storage/compose-compiler/repository") {
-      name = "Compose Compiler Snapshots"
-      content { includeGroup("androidx.compose.compiler") }
-    }
     mavenCentral { mavenContent { releasesOnly() } }
   }
 }
@@ -80,22 +86,13 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
 // Modules
-include("app")
-
-include("autofill-parser")
-
-include("coroutine-utils")
-
-include("crypto:common")
-
-include("crypto:pgpainless")
-
-include("format:common")
-
-include("passgen:diceware")
-
-include("passgen:random")
-
-include("sentry-stub")
-
-include("ui:compose")
+include(
+  "app",
+  "coroutine-utils",
+  "crypto:common",
+  "crypto:pgpainless",
+  "format:common",
+  "passgen:diceware",
+  "passgen:random",
+  "ui:compose"
+)

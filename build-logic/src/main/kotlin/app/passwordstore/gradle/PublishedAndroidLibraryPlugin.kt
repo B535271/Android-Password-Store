@@ -23,7 +23,7 @@ class PublishedAndroidLibraryPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     project.plugins.run {
-      apply(LibraryPlugin::class)
+      apply(AndroidLibraryPlugin::class)
       apply(MavenPublishBasePlugin::class)
       apply("me.tylerbwong.gradle.metalava")
     }

@@ -4,6 +4,7 @@
  */
 package app.passwordstore.util.git.sshj
 
+import android.app.Activity
 import android.util.Base64
 import androidx.appcompat.app.AppCompatActivity
 import app.passwordstore.util.coroutines.DispatcherProvider
@@ -42,10 +43,10 @@ import org.eclipse.jgit.transport.SshSessionFactory
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.util.FS
 
-sealed class SshAuthMethod(val activity: AppCompatActivity) {
-  class Password(activity: AppCompatActivity) : SshAuthMethod(activity)
+sealed class SshAuthMethod(val activity: Activity) {
+  class Password(activity: Activity) : SshAuthMethod(activity)
 
-  class SshKey(activity: AppCompatActivity) : SshAuthMethod(activity)
+  class SshKey(activity: Activity) : SshAuthMethod(activity)
 }
 
 abstract class InteractivePasswordFinder(private val dispatcherProvider: DispatcherProvider) :
@@ -86,6 +87,9 @@ class SshjSessionFactory(
         logcat { "New SSH connection created" }
         currentSession = it
       }
+  }
+  override fun getType(): String {
+    return "SshjSessionFactory"
   }
 
   fun close() {

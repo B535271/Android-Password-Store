@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-@file:Suppress("UnstableApiUsage")
-
 package app.passwordstore.gradle
 
 import app.passwordstore.gradle.flavors.FlavorDimensions
@@ -16,9 +14,10 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
+import org.gradle.api.JavaVersion
 
 @Suppress("Unused")
-class ApplicationPlugin : Plugin<Project> {
+class AndroidApplicationPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     project.pluginManager.apply(AppPlugin::class)
@@ -33,6 +32,7 @@ class ApplicationPlugin : Plugin<Project> {
       buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
       }
 
       buildTypes {
@@ -56,10 +56,7 @@ class ApplicationPlugin : Plugin<Project> {
       }
 
       flavorDimensions.add(FlavorDimensions.FREE)
-      productFlavors {
-        register(ProductFlavors.FREE) {}
-        register(ProductFlavors.NON_FREE) {}
-      }
+      productFlavors { register(ProductFlavors.FREE) {} }
 
       project.configureBuildSigning()
     }

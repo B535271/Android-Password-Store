@@ -27,7 +27,6 @@ class SettingsActivity : AppCompatActivity() {
 
   @Inject lateinit var passphraseCache: PGPPassphraseCache
   private val miscSettings = MiscSettings(this)
-  private val autofillSettings = AutofillSettings(this)
   private val passwordSettings = PasswordSettings(this)
   private val repositorySettings = RepositorySettings(this)
   private val generalSettings = GeneralSettings(this)
@@ -49,12 +48,6 @@ class SettingsActivity : AppCompatActivity() {
           titleRes = R.string.pref_category_general_title
           iconRes = R.drawable.app_settings_alt_24px
           generalSettings.provideSettings(this)
-        }
-        subScreen {
-          collapseIcon = true
-          titleRes = R.string.pref_category_autofill_title
-          iconRes = R.drawable.ic_wysiwyg_24px
-          autofillSettings.provideSettings(this)
         }
         subScreen {
           collapseIcon = true

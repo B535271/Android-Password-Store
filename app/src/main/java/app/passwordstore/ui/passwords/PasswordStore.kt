@@ -15,8 +15,8 @@ import android.view.MenuItem.OnActionExpandListener
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.SearchView.OnQueryTextListener
+import android.widget.SearchView
+import android.widget.SearchView.OnQueryTextListener
 import androidx.core.content.edit
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
@@ -34,7 +34,6 @@ import app.passwordstore.ui.folderselect.SelectFolderActivity
 import app.passwordstore.ui.git.base.BaseGitActivity
 import app.passwordstore.ui.onboarding.activity.OnboardingActivity
 import app.passwordstore.ui.settings.SettingsActivity
-import app.passwordstore.util.autofill.AutofillMatcher
 import app.passwordstore.util.extensions.base64
 import app.passwordstore.util.extensions.commitChange
 import app.passwordstore.util.extensions.contains
@@ -358,11 +357,6 @@ class PasswordStore : BaseGitActivity() {
         val args = Bundle()
         args.putString(REQUEST_ARG_PATH, PasswordRepository.getRepositoryDirectory().absolutePath)
 
-        // if the activity was started from the autofill settings, the
-        // intent is to match a clicked pwd with app. pass this to fragment
-        if (intent.getBooleanExtra("matchWith", false)) {
-          args.putBoolean("matchWith", true)
-        }
         supportActionBar?.apply {
           show()
           setDisplayHomeAsUpEnabled(false)
@@ -441,7 +435,6 @@ class PasswordStore : BaseGitActivity() {
         }
         selectedItems.map { item -> item.file.deleteRecursively() }
         refreshPasswordList()
-        AutofillMatcher.updateMatches(applicationContext, delete = filesToDelete)
         val fmt =
           selectedItems.joinToString(separator = ", ") { item ->
             item.file.toRelativeString(PasswordRepository.getRepositoryDirectory())
@@ -593,8 +586,6 @@ class PasswordStore : BaseGitActivity() {
           .setPositiveButton(android.R.string.ok, null)
           .show()
       }
-    } else {
-      AutofillMatcher.updateMatches(this, sourceDestinationMap)
     }
   }
 

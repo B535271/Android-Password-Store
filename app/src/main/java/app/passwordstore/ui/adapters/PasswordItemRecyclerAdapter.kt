@@ -8,8 +8,8 @@ import android.text.SpannableString
 import android.text.style.RelativeSizeSpan
 import android.view.MotionEvent
 import android.view.View
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.Selection
 import androidx.recyclerview.widget.RecyclerView
@@ -51,9 +51,9 @@ open class PasswordItemRecyclerAdapter(
 
   class PasswordItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    private val name: AppCompatTextView = itemView.findViewById(R.id.label)
-    private val childCount: AppCompatTextView = itemView.findViewById(R.id.child_count)
-    private val folderIndicator: AppCompatImageView = itemView.findViewById(R.id.folder_indicator)
+    private val name = itemView.findViewById<TextView>(R.id.label)
+    private val childCount = itemView.findViewById<TextView>(R.id.child_count)
+    private val folderIndicator = itemView.findViewById<ImageView>(R.id.folder_indicator)
     var itemDetails: ItemDetailsLookup.ItemDetails<String>? = null
 
     suspend fun bind(item: PasswordItem, dispatcherProvider: DispatcherProvider) {

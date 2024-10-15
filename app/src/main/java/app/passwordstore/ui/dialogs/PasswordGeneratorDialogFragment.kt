@@ -13,7 +13,6 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.IdRes
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.edit
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
@@ -90,7 +89,7 @@ class PasswordGeneratorDialogFragment : DialogFragment() {
       }
   }
 
-  private fun generate(passwordField: AppCompatTextView) {
+  private fun generate(passwordField: android.widget.TextView) {
     val passwordOptions = getSelectedOptions()
     val passwordLength = getLength()
     setPrefs(requireContext(), passwordOptions, passwordLength)

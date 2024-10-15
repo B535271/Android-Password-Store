@@ -4,19 +4,11 @@
  */
 package app.passwordstore.util.git.operation
 
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
+import android.app.Activity
 import app.passwordstore.R
 import app.passwordstore.data.repo.PasswordRepository
 import app.passwordstore.ui.sshkeygen.SshKeyGenActivity
 import app.passwordstore.ui.sshkeygen.SshKeyImportActivity
-import app.passwordstore.util.auth.BiometricAuthenticator
-import app.passwordstore.util.auth.BiometricAuthenticator.Result.CanceledBySystem
-import app.passwordstore.util.auth.BiometricAuthenticator.Result.CanceledByUser
-import app.passwordstore.util.auth.BiometricAuthenticator.Result.Failure
-import app.passwordstore.util.auth.BiometricAuthenticator.Result.Retry
-import app.passwordstore.util.auth.BiometricAuthenticator.Result.Success
 import app.passwordstore.util.coroutines.DispatcherProvider
 import app.passwordstore.util.extensions.launchActivity
 import app.passwordstore.util.git.GitCommandExecutor
@@ -34,8 +26,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -58,7 +48,7 @@ import org.eclipse.jgit.transport.URIish
  *
  * @param callingActivity the calling activity
  */
-abstract class GitOperation(protected val callingActivity: FragmentActivity) {
+abstract class GitOperation(protected val callingActivity: Activity) {
 
   /** List of [GitCommand]s that are executed by an operation. */
   abstract val commands: Array<GitCommand<out Any>>
@@ -72,7 +62,7 @@ abstract class GitOperation(protected val callingActivity: FragmentActivity) {
   protected val repository = PasswordRepository.repository!!
   protected val git = Git(repository)
   private val authActivity
-    get() = callingActivity as AppCompatActivity
+    get() = callingActivity
 
   private class HttpsCredentialsProvider(private val passwordFinder: PasswordFinder) :
     CredentialsProvider() {
@@ -107,9 +97,8 @@ abstract class GitOperation(protected val callingActivity: FragmentActivity) {
 
   private fun getSshKey(generateKey: Boolean) {
     runCatching {
-        callingActivity.launchActivity(
-          if (generateKey) SshKeyGenActivity::class.java else SshKeyImportActivity::class.java
-        )
+        val clazz = if (generateKey) SshKeyGenActivity::class.java else SshKeyImportActivity::class.java
+        callingActivity.launchActivity(clazz)
       }
       .onFailure { e -> logcat(ERROR) { e.asLog() } }
   }
@@ -163,46 +152,8 @@ abstract class GitOperation(protected val callingActivity: FragmentActivity) {
     when (authMode) {
       AuthMode.SshKey ->
         if (SshKey.exists) {
-          if (SshKey.mustAuthenticate) {
-            val result =
-              withContext(hiltEntryPoint.dispatcherProvider().main()) {
-                suspendCoroutine { cont ->
-                  BiometricAuthenticator.authenticate(
-                    callingActivity,
-                    R.string.biometric_prompt_title_ssh_auth,
-                  ) { result ->
-                    if (result !is Failure && result !is Retry) cont.resume(result)
-                  }
-                }
-              }
-            when (result) {
-              is Success -> {
-                registerAuthProviders(SshAuthMethod.SshKey(authActivity))
-              }
-              is CanceledByUser -> {
-                return Err(SSHException(DisconnectReason.AUTH_CANCELLED_BY_USER))
-              }
-              is Failure,
-              is CanceledBySystem -> {
-                throw IllegalStateException("Biometric authentication failures should be ignored")
-              }
-              else -> {
-                // There is a chance we succeed if the user recently confirmed
-                // their screen lock. Doing so would have a potential to confuse
-                // users though, who might deduce that the screen lock
-                // protection is not effective. Hence, we fail with an error.
-                Toast.makeText(
-                    callingActivity,
-                    R.string.biometric_auth_generic_failure,
-                    Toast.LENGTH_LONG,
-                  )
-                  .show()
-                callingActivity.finish()
-              }
-            }
-          } else {
-            registerAuthProviders(SshAuthMethod.SshKey(authActivity))
-          }
+          // if (SshKey.mustAuthenticate) {
+          registerAuthProviders(SshAuthMethod.SshKey(authActivity))
         } else {
           onMissingSshKeyFile()
           // This would correctly cancel the operation but won't surface a user-visible

@@ -8,9 +8,6 @@ package app.passwordstore.util.settings
 object PreferenceKeys {
 
   const val APP_THEME = "app_theme"
-  const val AUTOFILL_ENABLE = "autofill_enable"
-  const val BIOMETRIC_AUTH = "biometric_auth"
-  const val BIOMETRIC_AUTH_2 = "biometric_auth_delete_soon_please"
   @Deprecated(
     message = "Use CLEAR_CLIPBOARD_HISTORY instead",
     replaceWith = ReplaceWith("PreferenceKeys.CLEAR_CLIPBOARD_HISTORY"),
@@ -54,9 +51,7 @@ object PreferenceKeys {
   const val GIT_BRANCH_NAME = "git_branch"
   const val HTTPS_PASSWORD = "https_password"
   const val LENGTH = "length"
-  const val OREO_AUTOFILL_CUSTOM_PUBLIC_SUFFIXES = "oreo_autofill_custom_public_suffixes"
-  const val OREO_AUTOFILL_DEFAULT_USERNAME = "oreo_autofill_default_username"
-  const val DIRECTORY_STRUCTURE = "oreo_autofill_directory_structure"
+  const val DIRECTORY_STRUCTURE = "directory_structure"
   const val PREF_KEY_PWGEN_TYPE = "pref_key_pwgen_type"
   const val REPOSITORY_INITIALIZED = "repository_initialized"
   const val REPO_CHANGED = "repo_changed"
@@ -78,12 +73,6 @@ object PreferenceKeys {
   const val SSH_SEE_KEY = "ssh_see_key"
 
   @Deprecated("To be used only in Migrations.kt") const val USE_GENERATED_KEY = "use_generated_key"
-
-  const val PROXY_SETTINGS = "proxy_settings"
-  const val PROXY_HOST = "proxy_host"
-  const val PROXY_PORT = "proxy_port"
-  const val PROXY_USERNAME = "proxy_username"
-  const val PROXY_PASSWORD = "proxy_password"
 
   const val REBASE_ON_PULL = "rebase_on_pull"
 

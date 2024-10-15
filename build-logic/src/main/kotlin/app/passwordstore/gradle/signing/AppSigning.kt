@@ -13,7 +13,6 @@ import org.gradle.kotlin.dsl.configure
 private const val KEYSTORE_CONFIG_PATH = "keystore.properties"
 
 /** Configure signing for all build types. */
-@Suppress("UnstableApiUsage")
 internal fun Project.configureBuildSigning() {
   val keystoreConfigFile = rootProject.layout.projectDirectory.file(KEYSTORE_CONFIG_PATH)
   if (keystoreConfigFile.asFile.exists()) {

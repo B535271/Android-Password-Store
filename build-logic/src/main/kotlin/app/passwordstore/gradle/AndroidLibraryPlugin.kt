@@ -11,7 +11,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 
 @Suppress("Unused")
-class LibraryPlugin : Plugin<Project> {
+class AndroidLibraryPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     project.pluginManager.run {

@@ -5,6 +5,7 @@
 
 package app.passwordstore.util.git
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import app.passwordstore.R
@@ -31,7 +32,7 @@ import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.transport.RemoteRefUpdate
 
 class GitCommandExecutor(
-  private val activity: FragmentActivity,
+  private val activity: Activity,
   private val operation: GitOperation,
 ) {
 

@@ -48,7 +48,7 @@ class GitServerConfigActivity : BaseGitActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val isClone = intent?.extras?.getBoolean("cloning") ?: false
+    val isClone = intent?.extras?.getBoolean("cloning") == true
     if (isClone) {
       binding.saveButton.text = getString(R.string.clone_button)
     }

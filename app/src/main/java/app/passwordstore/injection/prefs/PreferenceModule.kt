@@ -48,9 +48,4 @@ class PreferenceModule {
   fun provideGitPreferences(@ApplicationContext context: Context): SharedPreferences {
     return createEncryptedPreferences(context, "git_operation")
   }
-
-  @[Provides ProxyPreferences Reusable]
-  fun provideProxyPreferences(@ApplicationContext context: Context): SharedPreferences {
-    return createEncryptedPreferences(context, "http_proxy")
-  }
 }

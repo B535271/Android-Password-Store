@@ -5,6 +5,7 @@
 
 package app.passwordstore.ui.sshkeygen
 
+//import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast

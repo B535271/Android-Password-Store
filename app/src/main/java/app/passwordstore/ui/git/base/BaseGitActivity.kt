@@ -4,9 +4,11 @@
  */
 package app.passwordstore.ui.git.base
 
+import android.app.Activity
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.fragment.app.FragmentActivity
 import app.passwordstore.R
 import app.passwordstore.injection.prefs.GitPreferences
 import app.passwordstore.util.coroutines.DispatcherProvider

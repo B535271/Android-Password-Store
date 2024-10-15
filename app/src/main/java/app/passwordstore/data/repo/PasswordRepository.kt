@@ -34,7 +34,7 @@ object PasswordRepository {
     get() = repository != null
 
   fun isGitRepo(): Boolean {
-    return repository?.objectDatabase?.exists() ?: false
+    return repository?.objectDatabase?.exists() == true
   }
 
   /**
@@ -83,10 +83,10 @@ object PasswordRepository {
 
           val remoteConfig = RemoteConfig(storedConfig, name)
           // remove the first and eventually the only uri
-          if (remoteConfig.urIs.size > 0) {
+          if (remoteConfig.urIs.isNotEmpty()) {
             remoteConfig.removeURI(remoteConfig.urIs[0])
           }
-          if (remoteConfig.pushURIs.size > 0) {
+          if (remoteConfig.pushURIs.isNotEmpty()) {
             remoteConfig.removePushURI(remoteConfig.pushURIs[0])
           }
 
@@ -174,7 +174,7 @@ object PasswordRepository {
     val passwordList = ArrayList<PasswordItem>()
     val showHidden = settings.getBoolean(PreferenceKeys.SHOW_HIDDEN_CONTENTS, false)
 
-    if (passList.size == 0) return passwordList
+    if (passList.isEmpty()) return passwordList
     if (!showHidden) {
       passList.filter { !it.isHidden }.toCollection(passList.apply { clear() })
     }

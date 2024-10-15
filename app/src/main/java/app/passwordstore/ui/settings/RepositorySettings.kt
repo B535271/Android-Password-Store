@@ -17,7 +17,6 @@ import app.passwordstore.data.repo.PasswordRepository
 import app.passwordstore.injection.prefs.GitPreferences
 import app.passwordstore.ui.git.config.GitConfigActivity
 import app.passwordstore.ui.git.config.GitServerConfigActivity
-import app.passwordstore.ui.proxy.ProxySelectorActivity
 import app.passwordstore.ui.sshkeygen.ShowSshKeyFragment
 import app.passwordstore.ui.sshkeygen.SshKeyGenActivity
 import app.passwordstore.ui.sshkeygen.SshKeyImportActivity
@@ -77,14 +76,6 @@ class RepositorySettings(private val activity: FragmentActivity) : SettingsProvi
           true
         }
       }
-      pref(PreferenceKeys.PROXY_SETTINGS) {
-        titleRes = R.string.pref_edit_proxy_settings
-        visible = gitSettings.url?.startsWith("https") == true && PasswordRepository.isGitRepo()
-        onClick {
-          activity.launchActivity(ProxySelectorActivity::class.java)
-          true
-        }
-      }
       pref(PreferenceKeys.GIT_CONFIG) {
         titleRes = R.string.pref_edit_git_config
         visible = PasswordRepository.isGitRepo()
@@ -97,7 +88,7 @@ class RepositorySettings(private val activity: FragmentActivity) : SettingsProvi
         titleRes = R.string.pref_import_ssh_key_title
         visible = PasswordRepository.isGitRepo()
         onClick {
-          activity.launchActivity(SshKeyImportActivity::class.java)
+          activity.launchActivity<SshKeyImportActivity>(SshKeyImportActivity::class.java)
           true
         }
       }
@@ -142,8 +133,8 @@ class RepositorySettings(private val activity: FragmentActivity) : SettingsProvi
       pref(PreferenceKeys.SSH_OPENKEYSTORE_CLEAR_KEY_ID) {
         titleRes = R.string.pref_title_openkeystore_clear_keyid
         visible =
-          activity.sharedPrefs.getString(PreferenceKeys.SSH_OPENKEYSTORE_KEYID)?.isNotEmpty()
-            ?: false
+          activity.sharedPrefs.getString(PreferenceKeys.SSH_OPENKEYSTORE_KEYID)?.isNotEmpty() ==
+            true
         onClick {
           activity.sharedPrefs.edit { putString(PreferenceKeys.SSH_OPENKEYSTORE_KEYID, null) }
           visible = false

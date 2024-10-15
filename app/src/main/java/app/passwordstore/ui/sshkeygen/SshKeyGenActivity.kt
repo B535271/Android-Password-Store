@@ -6,7 +6,6 @@ package app.passwordstore.ui.sshkeygen
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.security.keystore.UserNotAuthenticatedException
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -17,8 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import app.passwordstore.R
 import app.passwordstore.databinding.ActivitySshKeygenBinding
 import app.passwordstore.injection.prefs.GitPreferences
-import app.passwordstore.util.auth.BiometricAuthenticator
-import app.passwordstore.util.auth.BiometricAuthenticator.Result
 import app.passwordstore.util.coroutines.DispatcherProvider
 import app.passwordstore.util.extensions.keyguardManager
 import app.passwordstore.util.extensions.viewBinding
@@ -28,8 +25,6 @@ import com.github.michaelbull.result.runCatching
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -120,23 +115,6 @@ class SshKeyGenActivity : AppCompatActivity() {
     val result = runCatching {
       withContext(dispatcherProvider.io()) {
         val requireAuthentication = binding.keyRequireAuthentication.isChecked
-        if (requireAuthentication) {
-          val result =
-            withContext(dispatcherProvider.main()) {
-              suspendCoroutine { cont ->
-                BiometricAuthenticator.authenticate(
-                  this@SshKeyGenActivity,
-                  R.string.biometric_prompt_title_ssh_keygen,
-                ) { result ->
-                  // Do not cancel on failed attempts as these are handled by the
-                  // authenticator UI.
-                  if (result !is Result.Retry) cont.resume(result)
-                }
-              }
-            }
-          if (result !is Result.Success)
-            throw UserNotAuthenticatedException(getString(R.string.biometric_auth_generic_failure))
-        }
         keyGenType.generateKey(requireAuthentication)
       }
     }

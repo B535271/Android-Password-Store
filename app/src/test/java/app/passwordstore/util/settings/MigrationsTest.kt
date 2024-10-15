@@ -28,7 +28,6 @@ class MigrationsTest {
   private lateinit var filesDir: String
   private lateinit var sharedPrefs: SharedPreferences
   private lateinit var encryptedSharedPreferences: SharedPreferences
-  private lateinit var proxySharedPreferences: SharedPreferences
 
   @BeforeTest
   fun setup() {
@@ -36,7 +35,6 @@ class MigrationsTest {
     filesDir = tempFolder.root.path
     sharedPrefs = SPMockBuilder().createSharedPreferences()
     encryptedSharedPreferences = SPMockBuilder().createSharedPreferences()
-    proxySharedPreferences = SPMockBuilder().createSharedPreferences()
   }
 
   private fun checkOldKeysAreRemoved() =
@@ -61,7 +59,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     checkOldKeysAreRemoved()
     assertEquals(
@@ -82,7 +80,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     checkOldKeysAreRemoved()
     assertEquals(
@@ -103,7 +101,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     checkOldKeysAreRemoved()
     assertEquals(
@@ -117,7 +115,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     assertEquals(true, sharedPrefs.getBoolean(PreferenceKeys.SHOW_HIDDEN_FOLDERS, true))
     assertEquals(false, sharedPrefs.getBoolean(PreferenceKeys.SHOW_HIDDEN_CONTENTS, false))
@@ -129,7 +127,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     assertEquals(false, sharedPrefs.getBoolean(PreferenceKeys.SHOW_HIDDEN_FOLDERS, false))
     assertEquals(true, sharedPrefs.getBoolean(PreferenceKeys.SHOW_HIDDEN_CONTENTS, false))
@@ -141,7 +139,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     assertEquals(true, sharedPrefs.getBoolean(PreferenceKeys.CLEAR_CLIPBOARD_HISTORY, false))
     assertFalse(sharedPrefs.contains(PreferenceKeys.CLEAR_CLIPBOARD_20X))
@@ -153,7 +151,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     assertEquals("classic", sharedPrefs.getString(PreferenceKeys.PREF_KEY_PWGEN_TYPE))
   }
@@ -164,7 +162,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     assertEquals("diceware", sharedPrefs.getString(PreferenceKeys.PREF_KEY_PWGEN_TYPE))
   }
@@ -178,7 +176,7 @@ class MigrationsTest {
     runMigrations(
       filesDir,
       sharedPrefs,
-      GitSettings(sharedPrefs, encryptedSharedPreferences, proxySharedPreferences, filesDir),
+      GitSettings(sharedPrefs, encryptedSharedPreferences, filesDir),
     )
     assertFalse { sharedPrefs.contains(PreferenceKeys.GIT_EXTERNAL) }
     assertFalse { sharedPrefs.contains(PreferenceKeys.GIT_EXTERNAL_REPO) }

@@ -5,19 +5,11 @@
 
 package app.passwordstore.ui.settings
 
-import android.content.pm.ShortcutManager
-import android.os.Build
-import androidx.core.content.edit
-import androidx.core.content.getSystemService
 import androidx.fragment.app.FragmentActivity
 import app.passwordstore.R
-import app.passwordstore.util.auth.BiometricAuthenticator
-import app.passwordstore.util.auth.BiometricAuthenticator.Result
-import app.passwordstore.util.extensions.sharedPrefs
 import app.passwordstore.util.settings.DirectoryStructure
 import app.passwordstore.util.settings.PreferenceKeys
 import de.Maxr1998.modernpreferences.PreferenceScreen
-import de.Maxr1998.modernpreferences.helpers.onClick
 import de.Maxr1998.modernpreferences.helpers.singleChoice
 import de.Maxr1998.modernpreferences.helpers.switch
 import de.Maxr1998.modernpreferences.preferences.choice.SelectionItem
@@ -73,47 +65,6 @@ class GeneralSettings(private val activity: FragmentActivity) : SettingsProvider
         titleRes = R.string.pref_show_hidden_title
         summaryRes = R.string.pref_show_hidden_summary
         defaultValue = false
-      }
-
-      // See https://github.com/android-password-store/Android-Password-Store/issues/2802
-      val disableAuth = Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-      val canAuthenticate = BiometricAuthenticator.canAuthenticate(activity)
-      switch(PreferenceKeys.BIOMETRIC_AUTH_2) {
-        titleRes = R.string.pref_biometric_auth_title
-        defaultValue = false
-        enabled = !disableAuth
-        summaryRes =
-          if (disableAuth) R.string.pref_biometric_auth_summary_disabled_platform
-          else if (canAuthenticate) R.string.pref_biometric_auth_summary
-          else R.string.pref_biometric_auth_summary_error
-        onClick {
-          enabled = false
-          val isChecked = checked
-          activity.sharedPrefs.edit {
-            BiometricAuthenticator.authenticate(activity) { result ->
-              when (result) {
-                is Result.Success -> {
-                  // Apply the changes
-                  putBoolean(PreferenceKeys.BIOMETRIC_AUTH_2, checked)
-                  enabled = true
-                }
-                is Result.Retry -> {}
-                else -> {
-                  // If any error occurs, revert back to the previous
-                  // state. This
-                  // catch-all clause includes the cancellation case.
-                  putBoolean(PreferenceKeys.BIOMETRIC_AUTH_2, !checked)
-                  checked = !isChecked
-                  enabled = true
-                }
-              }
-            }
-          }
-          activity.getSystemService<ShortcutManager>()?.apply {
-            removeDynamicShortcuts(dynamicShortcuts.map { it.id }.toMutableList())
-          }
-          false
-        }
       }
     }
   }

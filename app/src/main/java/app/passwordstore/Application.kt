@@ -4,30 +4,25 @@
  */
 package app.passwordstore
 
+import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.StrictMode
-import androidx.appcompat.app.AppCompatDelegate.*
 import app.passwordstore.data.crypto.PGPPassphraseCache
 import app.passwordstore.injection.context.FilesDirPath
 import app.passwordstore.injection.prefs.SettingsPreferences
 import app.passwordstore.util.coroutines.DispatcherProvider
 import app.passwordstore.util.extensions.getString
-import app.passwordstore.util.features.Feature
 import app.passwordstore.util.features.Features
 import app.passwordstore.util.git.sshj.setUpBouncyCastleForSshj
-import app.passwordstore.util.proxy.ProxyUtils
 import app.passwordstore.util.settings.GitSettings
 import app.passwordstore.util.settings.PreferenceKeys
 import app.passwordstore.util.settings.runMigrations
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.Sentry
-import io.sentry.protocol.User
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import logcat.AndroidLogcatLogger
@@ -45,7 +40,6 @@ class Application : android.app.Application(), SharedPreferences.OnSharedPrefere
   @Inject lateinit var dispatcherProvider: DispatcherProvider
   @Inject lateinit var passphraseCache: PGPPassphraseCache
   @Inject lateinit var gitSettings: GitSettings
-  @Inject lateinit var proxyUtils: ProxyUtils
   @Inject lateinit var features: Features
 
   override fun onCreate() {
@@ -62,16 +56,7 @@ class Application : android.app.Application(), SharedPreferences.OnSharedPrefere
     setNightMode()
     setUpBouncyCastleForSshj()
     runMigrations(filesDirPath, prefs, gitSettings)
-    proxyUtils.setDefaultProxy()
     DynamicColors.applyToActivitiesIfAvailable(this)
-    Sentry.configureScope { scope ->
-      val user = User()
-      user.data =
-        Feature.entries.associate { feature ->
-          "features.${feature.configKey}" to features.isEnabled(feature).toString()
-        }
-      scope.user = user
-    }
     setupScreenOffHandler()
   }
 
@@ -108,24 +93,14 @@ class Application : android.app.Application(), SharedPreferences.OnSharedPrefere
 
     builder.detectContentUriWithoutPermission()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      builder.detectCredentialProtectedWhileLocked().detectImplicitDirectBoot()
-    }
+    builder.detectCredentialProtectedWhileLocked().detectImplicitDirectBoot()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      builder.detectNonSdkApiUsage()
-    }
+    builder.detectNonSdkApiUsage()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-      builder.detectIncorrectContextUse().detectUnsafeIntentLaunch()
-    }
+    builder.detectIncorrectContextUse().detectUnsafeIntentLaunch()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-      builder.penaltyListener(Executors.newSingleThreadExecutor()) { violation ->
-        logcat(VERBOSE) { violation.stackTraceToString() }
-      }
-    } else {
-      builder.penaltyLog()
+    builder.penaltyListener(Executors.newSingleThreadExecutor()) { violation ->
+      logcat(VERBOSE) { violation.stackTraceToString() }
     }
 
     val policy = builder.build()
@@ -133,12 +108,13 @@ class Application : android.app.Application(), SharedPreferences.OnSharedPrefere
   }
 
   private fun setNightMode() {
-    setDefaultNightMode(
+    val uim = getSystemService(UI_MODE_SERVICE) as UiModeManager;
+    uim.setApplicationNightMode(
       when (prefs.getString(PreferenceKeys.APP_THEME) ?: getString(R.string.app_theme_def)) {
-        "light" -> MODE_NIGHT_NO
-        "dark" -> MODE_NIGHT_YES
-        "follow_system" -> MODE_NIGHT_FOLLOW_SYSTEM
-        else -> MODE_NIGHT_AUTO_BATTERY
+        "light" -> UiModeManager.MODE_NIGHT_NO
+        "dark" -> UiModeManager.MODE_NIGHT_YES
+        "follow_system" -> UiModeManager.MODE_NIGHT_AUTO
+        else -> UiModeManager.MODE_NIGHT_AUTO
       }
     )
   }

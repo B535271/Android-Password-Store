@@ -7,16 +7,16 @@
 plugins {
   id("com.github.android-password-store.android-application")
   id("com.github.android-password-store.kotlin-android")
-  id("com.github.android-password-store.kotlin-kapt")
   id("com.github.android-password-store.versioning-plugin")
-  id("com.github.android-password-store.sentry")
   id("com.github.android-password-store.rename-artifacts")
+  //  alias(libs.plugins.ksp)
+  id("com.github.android-password-store.kotlin-kapt")
+  //  kotlin("kapt") version "2.0.21" // already included by build-logic
   alias(libs.plugins.hilt)
   alias(libs.plugins.kotlin.composeCompiler)
 }
 
 android {
-  compileOptions { isCoreLibraryDesugaringEnabled = true }
   namespace = "app.passwordstore"
 
   defaultConfig {
@@ -31,37 +31,45 @@ android {
   packaging { resources.excludes.add("META-INF/versions/**") }
 }
 
+composeCompiler { reportsDestination = layout.buildDirectory.dir("compose_compiler") }
+
+kapt { correctErrorTypes = true } // Allow references to generated code
+
+hilt { enableAggregatingTask = true }
+
 dependencies {
   implementation(platform(libs.compose.bom))
+  
   kapt(libs.dagger.hilt.compiler)
+  //  ksp(libs.dagger.hilt.compiler)
+  implementation(libs.dagger.hilt.android)
   implementation(libs.androidx.annotation)
-  coreLibraryDesugaring(libs.android.desugarJdkLibs)
-  implementation(projects.autofillParser)
+
   implementation(projects.coroutineUtils)
   implementation(projects.crypto.pgpainless)
   implementation(projects.format.common)
   implementation(projects.passgen.diceware)
   implementation(projects.passgen.random)
   implementation(projects.ui.compose)
-  implementation(libs.androidx.activity)
+
+  implementation(libs.bundles.androidxLifecycle)
+  kapt(libs.androidx.lifecycle.compiler)
+
+  implementation(libs.androidx.activity.ktx)
   implementation(libs.androidx.activity.compose)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.autofill)
-  implementation(libs.androidx.biometricKtx)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.documentfile)
   implementation(libs.androidx.fragment.ktx)
-  implementation(libs.bundles.androidxLifecycle)
-  implementation(libs.androidx.lifecycle.viewmodel.compose)
-  implementation(libs.androidx.material)
-  implementation(libs.androidx.preference)
+  implementation(libs.androidx.preference.ktx)
   implementation(libs.androidx.recyclerview)
   implementation(libs.androidx.recyclerviewSelection)
   implementation(libs.androidx.security)
   implementation(libs.androidx.swiperefreshlayout)
-  implementation(libs.compose.ui.tooling)
-  implementation(libs.dagger.hilt.android)
+
+  implementation(libs.bundles.compose)
+
+  implementation(libs.android.material.components)
 
   implementation(libs.kotlinx.collections.immutable)
   implementation(libs.kotlinx.coroutines.android)
@@ -87,10 +95,6 @@ dependencies {
   implementation(libs.thirdparty.slf4j.api) {
     because("SSHJ now uses SLF4J 2.0 which we don't want")
   }
-
-  nonFreeImplementation(libs.thirdparty.nonfree.googlePlayAuthApiPhone)
-  nonFreeImplementation(libs.thirdparty.nonfree.sentry)
-  freeImplementation(projects.sentryStub)
 
   testImplementation(libs.testing.robolectric)
   testImplementation(libs.testing.sharedPrefsMock)

@@ -39,7 +39,7 @@ class PGPKeyListActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val isSelecting = intent.extras?.getBoolean(EXTRA_KEY_SELECTION) ?: false
+    val isSelecting = intent.extras?.getBoolean(EXTRA_KEY_SELECTION) == true
     setContent {
       APSTheme {
         Scaffold(

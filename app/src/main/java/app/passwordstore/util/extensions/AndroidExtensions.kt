@@ -5,21 +5,16 @@
 
 package app.passwordstore.util.extensions
 
+import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.ApplicationInfoFlags
-import android.content.pm.PackageManager.PackageInfoFlags
-import android.os.Build
 import android.util.Base64
 import android.util.TypedValue
 import android.view.View
-import android.view.autofill.AutofillManager
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
@@ -35,10 +30,6 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.google.android.material.snackbar.Snackbar
 import logcat.logcat
-
-/** Get an instance of [AutofillManager]. Only available on Android Oreo and above */
-val Context.autofillManager: AutofillManager?
-  get() = getSystemService()
 
 /** Get an instance of [ClipboardManager] */
 val Context.clipboard
@@ -76,10 +67,10 @@ fun Context.resolveAttribute(attr: Int): Int {
 }
 
 /**
- * Commit changes to the store from a [FragmentActivity] using a custom implementation of
+ * Commit changes to the store from a [Activity] using a custom implementation of
  * [GitOperation]
  */
-suspend fun FragmentActivity.commitChange(message: String): Result<Unit, Throwable> {
+suspend fun Activity.commitChange(message: String): Result<Unit, Throwable> {
   if (!PasswordRepository.isInitialized) {
     return Ok(Unit)
   }
@@ -103,7 +94,7 @@ suspend fun FragmentActivity.commitChange(message: String): Result<Unit, Throwab
 }
 
 /** Check if [permission] has been granted to the app. */
-fun FragmentActivity.isPermissionGranted(permission: String): Boolean {
+fun Activity.isPermissionGranted(permission: String): Boolean {
   return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 }
 
@@ -112,7 +103,7 @@ fun FragmentActivity.isPermissionGranted(permission: String): Boolean {
  * [com.google.android.material.floatingactionbutton.FloatingActionButton] if one exists in the
  * [view]
  */
-fun FragmentActivity.snackbar(
+fun Activity.snackbar(
   view: View = findViewById(android.R.id.content),
   message: String,
   length: Int = Snackbar.LENGTH_SHORT,
@@ -124,7 +115,7 @@ fun FragmentActivity.snackbar(
 }
 
 /** Launch an activity denoted by [clazz]. */
-fun <T : ComponentActivity> ComponentActivity.launchActivity(clazz: Class<T>) {
+fun <T : Activity> Activity.launchActivity(clazz: Class<T>) {
   startActivity(Intent(this, clazz).setAction(Intent.ACTION_VIEW))
 }
 
@@ -134,22 +125,6 @@ fun SharedPreferences.getString(key: String): String? = getString(key, null)
 /** Convert this [String] to its [Base64] representation */
 fun String.base64(): String {
   return Base64.encodeToString(encodeToByteArray(), Base64.NO_WRAP)
-}
-
-fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int): PackageInfo {
-  return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    getPackageInfo(packageName, PackageInfoFlags.of(flags.toLong()))
-  } else {
-    getPackageInfo(packageName, flags)
-  }
-}
-
-fun PackageManager.getApplicationInfoCompat(packageName: String, flags: Int): ApplicationInfo {
-  return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    getApplicationInfo(packageName, ApplicationInfoFlags.of(flags.toLong()))
-  } else {
-    getApplicationInfo(packageName, flags)
-  }
 }
 
 /** Allows conditionally applying the given [modifier] if [isEnabled] is `true`. */

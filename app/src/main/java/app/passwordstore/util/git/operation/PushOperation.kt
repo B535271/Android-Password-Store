@@ -4,10 +4,11 @@
  */
 package app.passwordstore.util.git.operation
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import org.eclipse.jgit.api.GitCommand
 
-class PushOperation(callingActivity: AppCompatActivity) : GitOperation(callingActivity) {
+class PushOperation(callingActivity: Activity) : GitOperation(callingActivity) {
 
   override val commands: Array<GitCommand<out Any>> =
     arrayOf(git.push().setPushAll().setRemote("origin"))

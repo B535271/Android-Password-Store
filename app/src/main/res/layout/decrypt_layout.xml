@@ -12,7 +12,7 @@
   android:paddingTop="16dp"
   tools:context="app.passwordstore.ui.crypto.DecryptActivity">
 
-  <androidx.appcompat.widget.AppCompatTextView
+  <TextView
     android:id="@+id/password_category"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
     app:layout_constraintTop_toTopOf="parent"
     tools:text="CATEGORY HERE" />
 
-  <androidx.appcompat.widget.AppCompatTextView
+  <TextView
     android:id="@+id/password_file"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
     app:layout_constraintTop_toBottomOf="@id/password_category"
     tools:text="PASSWORD FILE NAME HERE" />
 
-  <androidx.appcompat.widget.AppCompatImageView
+  <ImageView
     android:id="@+id/divider"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

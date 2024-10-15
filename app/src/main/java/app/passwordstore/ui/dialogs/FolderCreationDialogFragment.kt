@@ -5,9 +5,9 @@
 package app.passwordstore.ui.dialogs
 
 import android.app.Dialog
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import app.passwordstore.R

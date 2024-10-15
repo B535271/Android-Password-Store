@@ -9,6 +9,4 @@ plugins {
   id("com.github.android-password-store.versions")
 }
 
-tasks.named("wrapper") {
-    enabled = false
-}
+tasks.named("wrapper") { enabled = false }

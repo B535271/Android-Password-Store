@@ -7,20 +7,23 @@ package app.passwordstore.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.jetbrains.kotlin.gradle.internal.Kapt3GradleSubplugin
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+
+// import com.google.devtools.ksp.gradle.KspGradleSubplugin
+// import com.google.devtools.ksp.gradle.KspExtension
+// https://github.com/google/ksp/
 
 @Suppress("Unused")
-class KotlinKaptPlugin : Plugin<Project> {
+class KotlinKspPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
-    project.pluginManager.apply(Kapt3GradleSubplugin::class)
+    /*
+    project.pluginManager.apply(KspGradleSubplugin::class)
     project.afterEvaluate {
-      project.extensions.configure<KaptExtension> {
+      project.extensions.configure<KspExtension> {
         javacOptions {
           if (hasDaggerCompilerDependency()) {
+            // https://dagger.dev/dev-guide/compiler-options#fastinit-mode
+            option("-Adagger.fastInit=enabled")
             // Enable the better, experimental error messages
             // https://github.com/google/dagger/commit/0d2505a727b54f47b8677f42dd4fc5c1924e37f5
             option("-Adagger.experimentalDaggerErrorMessages=enabled")
@@ -36,8 +39,9 @@ class KotlinKaptPlugin : Plugin<Project> {
         }
       }
     }
+     */
     project.tasks
-      .matching { it.name.startsWith("kapt") && it.name.endsWith("UnitTestKotlin") }
+      .matching { it.name.startsWith("ksp") && it.name.endsWith("UnitTestKotlin") }
       .configureEach { enabled = false }
   }
 

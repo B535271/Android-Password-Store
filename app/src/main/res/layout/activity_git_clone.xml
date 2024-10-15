@@ -36,7 +36,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
       android:id="@+id/label_auth_mode"
       style="@style/TextAppearance.MaterialComponents.Headline6"
       android:layout_width="wrap_content"

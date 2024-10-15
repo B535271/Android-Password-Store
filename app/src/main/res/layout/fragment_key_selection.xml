@@ -10,7 +10,7 @@
   android:background="?android:attr/colorBackground"
   android:orientation="vertical">
 
-  <androidx.appcompat.widget.AppCompatImageView
+  <ImageView
     android:id="@+id/app_icon"
     android:layout_width="64dp"
     android:layout_height="64dp"
@@ -21,7 +21,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
-  <androidx.appcompat.widget.AppCompatTextView
+  <TextView
     android:id="@+id/app_name"
     android:layout_width="0dp"
     android:layout_height="wrap_content"

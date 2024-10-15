@@ -324,11 +324,7 @@ class PasswordFragment : Fragment(R.layout.password_recycler_view) {
               if (item.type == PasswordItem.TYPE_CATEGORY) {
                 navigateTo(item.file)
               } else {
-                if (requireArguments().getBoolean("matchWith", false)) {
-                  requireStore().matchPasswordWithApp(item)
-                } else {
-                  requireStore().decryptPassword(item)
-                }
+                requireStore().decryptPassword(item)
               }
             }
           }
